@@ -1,0 +1,134 @@
+CREATE DATABASE compfundation;
+
+CREATE TABLE `tarif` (
+  `tar_id` int(10) NOT NULL AUTO_INCREMENT,
+  `tar_montanthtannuel` int(10) NOT NULL,
+  PRIMARY KEY (`tar_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1
+
+CREATE TABLE `niveau` (
+  `niv_id` int(10) NOT NULL AUTO_INCREMENT,
+  `niv_libelle` varchar(250) NOT NULL,
+  PRIMARY KEY (`niv_id`)
+) ENGINE=InnoDB AUTO_INCREMENT=6 DEFAULT CHARSET=latin1
+
+CREATE TABLE `organisme` (
+  `org_id` int(10) NOT NULL AUTO_INCREMENT,
+  `org_nom` varchar(250) NOT NULL,
+  `org_email` varchar(250) NOT NULL,
+  `org_telephone` varchar(250) NOT NULL,
+  `org_codepostal` int(5) NOT NULL,
+  `org_ville` varchar(250) NOT NULL,
+  `org_statutcotisation` int(10) NOT NULL,
+  PRIMARY KEY (`org_id`)
+) ENGINE=InnoDB AUTO_INCREMENT=59 DEFAULT CHARSET=latin1
+
+CREATE TABLE `intervenant` (
+  `int_id` int(10) NOT NULL AUTO_INCREMENT,
+  `int_nom` varchar(250) NOT NULL,
+  `int_prenom` varchar(250) NOT NULL,
+  `int_email` varchar(250) NOT NULL,
+  `int_telephone` varchar(250) NOT NULL,
+  `int_fax` varchar(250) NOT NULL,
+  `int_statutcotisation` int(10) NOT NULL,
+  PRIMARY KEY (`int_id`)
+) ENGINE=InnoDB AUTO_INCREMENT=48 DEFAULT CHARSET=latin1
+
+CREATE TABLE `abonnement` (
+  `abo_id` int(10) NOT NULL AUTO_INCREMENT,
+  `abo_libelle` varchar(250) NOT NULL,
+  `abo_dureemini` int(10) NOT NULL,
+  `abo_dureemaxi` int(10) NOT NULL,
+  `abo_description` text NOT NULL,
+  PRIMARY KEY (`abo_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1
+
+CREATE TABLE `contact` (
+  `ctc_id` int(10) NOT NULL AUTO_INCREMENT,
+  `ctc_nom` varchar(250) NOT NULL,
+  `ctc_prenom` varchar(250) NOT NULL,
+  `ctc_email` varchar(250) NOT NULL,
+  `ctc_telephone` varchar(250) NOT NULL,
+  `ctc_idorganisme` int(10) NOT NULL,
+  PRIMARY KEY (`ctc_id`),
+  KEY `fk_orga_contact` (`ctc_idorganisme`),
+  CONSTRAINT `fk_orga_contact` FOREIGN KEY (`ctc_idorganisme`) REFERENCES `organisme` (`org_id`)
+) ENGINE=InnoDB AUTO_INCREMENT=34 DEFAULT CHARSET=latin1
+
+CREATE TABLE `recherche` (
+  `rec_id` int(10) NOT NULL AUTO_INCREMENT,
+  `rec_date` date NOT NULL DEFAULT '0000-00-00',
+  `rec_heure` time NOT NULL DEFAULT '00:00:00',
+  `rec_codepostal` int(5) NOT NULL,
+  `rec_ville` varchar(250) NOT NULL,
+  `rec_description` text,
+  `rec_active` int(10) NOT NULL,
+  `rec_datelimiteintervention` date NOT NULL DEFAULT '0000-00-00',
+  `rec_nombrejoursintervention` int(5) NOT NULL,
+  `rec_idorganisme` int(10) NOT NULL,
+  `rec_idctcorigine` int(10) NOT NULL,
+  PRIMARY KEY (`rec_id`),
+  KEY `fk_org_rech` (`rec_idorganisme`),
+  KEY `fk_ctc_rech` (`rec_idctcorigine`),
+  CONSTRAINT `fk_ctc_rech` FOREIGN KEY (`rec_idctcorigine`) REFERENCES `contact` (`ctc_id`),
+  CONSTRAINT `fk_org_rech` FOREIGN KEY (`rec_idorganisme`) REFERENCES `organisme` (`org_id`)
+) ENGINE=InnoDB AUTO_INCREMENT=17 DEFAULT CHARSET=latin1
+
+CREATE TABLE `domaine` (
+  `dom_id` int(10) NOT NULL AUTO_INCREMENT,
+  `dom_libelle` varchar(250) NOT NULL,
+  `dom_iddomaineparent` int(10) NOT NULL,
+  PRIMARY KEY (`dom_id`),
+  KEY `fk_dom_dom` (`dom_iddomaineparent`),
+  CONSTRAINT `fk_dom_dom` FOREIGN KEY (`dom_iddomaineparent`) REFERENCES `domaine` (`dom_id`)
+) ENGINE=InnoDB AUTO_INCREMENT=11 DEFAULT CHARSET=latin1
+
+CREATE TABLE `appliquer` (
+  `app_id` int(10) NOT NULL AUTO_INCREMENT,
+  `app_idtarif` int(10) NOT NULL,
+  `app_idabonnement` int(10) NOT NULL,
+  `app_datedebut` date NOT NULL DEFAULT '0000-00-00',
+  PRIMARY KEY (`app_id`),
+  KEY `fk_tarif_appliquer3` (`app_idtarif`),
+  KEY `fk_tarif_abo_appliquer` (`app_idabonnement`),
+  CONSTRAINT `fk_tarif_abo_appliquer` FOREIGN KEY (`app_idabonnement`) REFERENCES `abonnement` (`abo_id`),
+  CONSTRAINT `fk_tarif_appliquer3` FOREIGN KEY (`app_idtarif`) REFERENCES `tarif` (`tar_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1
+
+CREATE TABLE `concerne` (
+  `conc_iddomaine` int(10) NOT NULL,
+  `conc_idrecherche` int(10) NOT NULL,
+  PRIMARY KEY (`conc_iddomaine`,`conc_idrecherche`),
+  KEY `fk_rec_conc` (`conc_idrecherche`),
+  CONSTRAINT `fk_dom_conc` FOREIGN KEY (`conc_iddomaine`) REFERENCES `domaine` (`dom_id`),
+  CONSTRAINT `fk_rec_conc` FOREIGN KEY (`conc_idrecherche`) REFERENCES `recherche` (`rec_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1
+
+CREATE TABLE `estcompetent` (
+  `comp_iddomaine` int(10) NOT NULL,
+  `comp_idniveau` int(10) NOT NULL,
+  `comp_idintervenant` int(10) NOT NULL,
+  PRIMARY KEY (`comp_iddomaine`,`comp_idniveau`,`comp_idintervenant`),
+  KEY `fk_int_comp` (`comp_idintervenant`),
+  KEY `fk_niv_comp` (`comp_idniveau`),
+  CONSTRAINT `fk_domaine_comp` FOREIGN KEY (`comp_iddomaine`) REFERENCES `domaine` (`dom_id`),
+  CONSTRAINT `fk_int_comp` FOREIGN KEY (`comp_idintervenant`) REFERENCES `intervenant` (`int_id`),
+  CONSTRAINT `fk_niv_comp` FOREIGN KEY (`comp_idniveau`) REFERENCES `niveau` (`niv_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1
+
+CREATE TABLE `posseder` (
+  `poss_id` int(10) NOT NULL AUTO_INCREMENT,
+  `poss_idorganisme` int(10) NOT NULL,
+  `poss_idintervenant` int(10) NOT NULL,
+  `poss_idabonnement` int(10) NOT NULL,
+  `poss_datedebut` date NOT NULL DEFAULT '0000-00-00',
+  `poss_datefin` date NOT NULL DEFAULT '0000-00-00',
+  PRIMARY KEY (`poss_id`),
+  KEY `fk_abo_poss` (`poss_idabonnement`),
+  KEY `fk_org_poss` (`poss_idorganisme`),
+  KEY `fk_int_poss` (`poss_idintervenant`),
+  CONSTRAINT `fk_abo_poss` FOREIGN KEY (`poss_idabonnement`) REFERENCES `abonnement` (`abo_id`),
+  CONSTRAINT `fk_int_poss` FOREIGN KEY (`poss_idintervenant`) REFERENCES `intervenant` (`int_id`),
+  CONSTRAINT `fk_org_poss` FOREIGN KEY (`poss_idorganisme`) REFERENCES `organisme` (`org_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1
+

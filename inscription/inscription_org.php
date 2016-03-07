@@ -15,7 +15,7 @@ include_once('bdd_insc.php');
     
     <body>
 
-        <article class="Bandeau_titre">
+        <article id="Bandeau_titre">
             <a href=".."><img id="logo" src="../general/logo.jpg"/></a>
             <h1>CompFundation</h1>
             <h2>L'entreprise des services numériques</h2>
@@ -52,13 +52,13 @@ include_once('bdd_insc.php');
             </ul>
         </nav>
 
-        <div>
+        <div id="corp">
             <br/>
 
             <form action="" method="post">
                 <fieldset>
 
-                    <legend>Organisme</legend>
+                    <p>Organisme</p>
 
                     Nom :
                     <input type="text" name="nom_org"/>
@@ -82,7 +82,7 @@ include_once('bdd_insc.php');
                     <br/>
 
                     <fieldset>
-                        <legend>Contact:</legend>
+                        <p>Contact:</p>
                         Nom :
                         <input type="text" name="nom_cont"/>
                         Prenom :

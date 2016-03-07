@@ -1,3 +1,5 @@
+<?php ini_set('display_errors', 1); ?>
+
 <!DOCTYPE html>
 
 <html>
@@ -43,14 +45,44 @@
                 <li class="menu">
                     <a href="contact.php">CONTACT</a>
                 </li>
-
             </ul>
         </nav>
 
         <div id="corp">
             <br/>
 
-            F I C H E    D E    C O N T A C T
+            <form method="post" action="">
+                <p>
+                    Si vous avez rencontré le moindre problème avec ce site,
+                    <br/>que vous avez des signalements a faire,
+                    <br/>ou que vous souhaitez simplement nous faire passer un message,
+                    <br/>exprimez vous dans la section suivante :
+                </p>
+                <br/>
+                Objet : <input type="text" name="sujet"/>
+                <br/>
+                <br/>
+                <p>Votre message :</p>
+                <textarea name="message" rows="5" cols="60"></textarea>
+                <br/>
+                <input type="submit"/>
+            </form>
+            <br/>
+            
+            <?php
+            if (isset($_POST['sujet']) and isset($_POST['message']))
+            {
+                $destinataire = 'tristan.pinaudeau@epsi.fr';
+                if (mail($destinataire, $_POST['sujet'], $_POST['message']))
+                {
+                    print('<p>Le message bien envoyé !</p>');
+                }
+                else
+                {
+                    print('<p>Une erreur s\'est produite, veuillez bien remplir les deux champs.</p>');
+                }
+            }
+            ?>
             
             <br/>
         </div>

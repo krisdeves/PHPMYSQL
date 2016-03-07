@@ -23,7 +23,7 @@ $boolOrg = mysqli_fetch_array($requete_boolOrg);
 
 if ($boolOrg[0]) // si l'utilisateur est un organisme
 {
-    header('Location: recherche_org.php'); // envoie a la page de recherche pour les organismes
+    header('Location: annonce_org.php'); // envoie a la page de recherche pour les organismes
 }
 elseif ($boolInt[0]) // sinon, si l'utilisateur est un organisme
 {

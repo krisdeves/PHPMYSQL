@@ -64,6 +64,7 @@ include_once('../general/bdd_connect.php');
                 </tr>
 
                 <?php
+
                 $requete_annoncesOrg =
                     'SELECT dom_libelle AS domaine, rec_description AS details, rec_ville AS lieu, rec_date AS date, org_nom AS organisme
                     FROM recherche
@@ -75,8 +76,13 @@ include_once('../general/bdd_connect.php');
                         ON conc_iddomaine = dom_id
                     ORDER BY date';
                 $tableau_annonces = mysqli_query($connexion, $requete_annoncesOrg);
+
+                if (isset($_POST['export']))
+                {$fp = fopen('../tmp/export.csv', 'w');} 
+                
                 while ($row = mysqli_fetch_assoc($tableau_annonces))
                 {
+
                     print(
                         '<tr>
                             <td>'.$row['domaine'].'</td>
@@ -85,11 +91,33 @@ include_once('../general/bdd_connect.php');
                             <td>'.$row['date'].'</td>
                             <td>'.$row['organisme'].'</td>
                         </tr>');
+
+                    if (isset($_POST['export']))
+                    {
+                        $liste = array($row);
+
+                        foreach ($liste as $elements)
+                        {
+                            fputcsv($fp, $elements);
+                        }
+                    }
                 }
+                
+                if (isset($_POST['export']))
+                {
+                    fclose($fp);
+                    header('Location: ../tmp/export.csv');
+                }
+                
                 ?>
 
             </table>
-
+            <br/>
+            
+            <form method="post" action="">
+                <input type="submit" name="export" value="Exporter" />
+            </form>
+            
         </div>
 
         <footer>

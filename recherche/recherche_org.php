@@ -1,6 +1,6 @@
 <?php
 ini_set('display_errors', 1);
-include_once('bdd_rechercheOrg.php');
+include_once('../general/bdd_connect.php')
 ?>
 
 <!DOCTYPE html>
@@ -57,17 +57,15 @@ include_once('bdd_rechercheOrg.php');
 
             <br/>
 
-            <?php
-            if (isset($enregistrement_accomplie)) // si une recherche a déja été réalisée
-            {
-                print('
-                    <table>
-                        <tr>
-                            <th>Nom</th>
-                            <th>Prenom</th>
-                            <th>Email</th>
-                            <th>Telephone</th>
-                        </tr>'); // affiche les entetes du tableau
+            <table>
+                <tr>
+                    <th>Nom</th>
+                    <th>Prenom</th>
+                    <th>Email</th>
+                    <th>Telephone</th>
+                </tr>
+
+                <?php
 
                 $requete_shearchResult = 
                     'SELECT int_nom AS nom, int_prenom AS prenom, int_email AS email, int_telephone AS telephone
@@ -80,11 +78,15 @@ include_once('bdd_rechercheOrg.php');
                         ON conc_iddomaine = dom_id
                     INNER JOIN recherche
                         ON conc_idrecherche = rec_id
-                    WHERE dom_libelle = \''.$_POST['domaine'].'\'
+                    WHERE dom_libelle = \''.$_GET['domaine'].'\'
                     GROUP BY int_id
                     ORDER BY int_nom'; // requete qui va rechercher les intervenants corresondant au domaine voulu
 
                 $tableau_intervenants = mysqli_query($connexion, $requete_shearchResult); // effectue la requete
+
+                if (isset($_POST['export']))
+                {$fp = fopen('../tmp/export.csv', 'w');} 
+
                 while ($row = mysqli_fetch_assoc($tableau_intervenants)) // stoque les resultats dans une matrice
                 {
                     print(
@@ -94,77 +96,31 @@ include_once('bdd_rechercheOrg.php');
                             <td>'.$row['email'].'</td>
                             <td>'.$row['telephone'].'</td>
                         </tr>'); // affiche  les resultats sous forme d'un tableau
+
+                    if (isset($_POST['export']))
+                    {
+                        $liste = array($row);
+
+                        foreach ($liste as $elements)
+                        {
+                            fputcsv($fp, $elements);
+                        }
+                    }
                 }
 
-                print('</table>');
-            }
-
-            else // sinon (si aucune recherche n'a encore été éfféctuée pour cette session)
-
-            {?>
-                --Recherche--
-                <form method="post" action="">
-
-                    <?php print('<p>Placez une annonce en tant que '.$nomOrg[0].'<p>'); ?>
-
-                    <p>Code postal :</p>
-                    <input name="codepost" type="text"/>
-
-                    <p>Ville :</p>
-                    <input name="ville" type="text"/>
-
-                    <p>Description :</p>
-                    <textarea name="desc" rows="4" cols="50">Décrivez le post en quelques lignes...</textarea>
-
-                    <p>Domaine :</p>
-                    <select name="domaine">
-                        <option selected></option>
-                        <option value="informatique">informatique</option>
-                        <option value="hotelerie">hotelerie</option>
-                        <option value="santé">santé</option>
-                        <option value="spectacle">spectacle</option>
-                        <option value="industrie">industrie</option>
-                        <option value="finance">finance</option>
-                    </select>
-
-                    <p>Date limite de l'annonce :</p>
-                    <select name="jour">
-                        <?php
-                            for ($i=1; $i<=31; $i++)
-                            {
-                                print('<option>'.$i.'</option>');
-                            }
-                        ?>                
-                    </select>
-                    /
-                    <select name="mois">
-                        <?php
-                            for ($i=1; $i<=12; $i++)
-                            {
-                                print('<option>'.$i.'</option>');
-                            }
-                        ?>
-                    </select>
-                    /
-                    <select name="annee">
-                        <?php
-                            for ($i=date(Y); $i<=3000; $i++)
-                            {
-                                print('<option>'.$i.'</option>');
-                            }
-                        ?>
-                    </select>
-
-                    <p>Durée d'intervention : (en nombre de jours)</p>
-                    <input name="duree" type="text"/>
-
-                    <input type="submit" name="recherche"/>
-
-                </form>
-            <?php
-            }
-            ?>
+                if (isset($_POST['export']))
+                {
+                    fclose($fp);
+                    header('Location: ../tmp/export.csv');
+                }
+                ?>
             
+            </table>
+            
+            <form method="post" action="">
+                <input type="submit" name="export" value="Exporter" />
+            </form>
+
             <br/>
         </div>
 

@@ -132,8 +132,8 @@ ul .menu:hover #sous-menu
 #corp
 {
     background-color: wheat;
-    width: 65%;
     margin: 0% auto;
+    height: 625px;
     padding: 50px;
     font-family: fantasy;
     text-align: center;

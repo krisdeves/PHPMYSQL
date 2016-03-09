@@ -59,6 +59,9 @@
                     <br/>exprimez vous dans la section suivante :
                 </p>
                 <br/>
+                Votre e-mail : <input type="text" name="email_cont"/>
+                <br/>                
+                <br/>                
                 Objet : <input type="text" name="sujet"/>
                 <br/>
                 <br/>
@@ -70,10 +73,11 @@
             <br/>
             
             <?php
-            if (isset($_POST['sujet']) and isset($_POST['message']))
+            if (isset($_POST['sujet']) and isset($_POST['message']) and isset($_POST['email_cont']))
             {
+                $expediteur = 'From: '.$_POST['email_cont'];
                 $destinataire = 'tristan.pinaudeau@epsi.fr';
-                if (mail($destinataire, $_POST['sujet'], $_POST['message']))
+                if (mail($destinataire, $_POST['sujet'], $_POST['message'], $_POST['']))
                 {
                     print('<p>Le message bien envoyé !</p>');
                 }

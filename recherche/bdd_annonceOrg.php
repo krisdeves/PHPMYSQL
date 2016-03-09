@@ -79,7 +79,6 @@ if (isset($_SESSION['email'])) // si l'utilisateur est connecté
     }
     else // sinon, si l'annonce n'est pas envoyée
     {
-        echo 'check';
         // on extrait l'id de l'organisme a partir de son email
         $requete_nomOrg = mysqli_query($connexion, 
             'SELECT org_nom
